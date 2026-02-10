@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador de Movilidad de Clase Social en México</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#f7f6f2;
+      --paper:#ffffff;
+      --ink:#1a1f2b;
+      --muted:#4b5563;
+      --border:rgba(17,24,39,.10);
+
+      --primary:#0b3d2e;   /* verde institucional */
+      --primary2:#166534;  /* verde profundo */
+      --gold:#b45309;      /* oro/cobre */
+      --ring: rgba(180,83,9,.18);
+    }
+    body{
+      font-family:'Inter',sans-serif;
+      background:
+        radial-gradient(900px 420px at 10% 0%, rgba(11,61,46,.10), transparent 55%),
+        radial-gradient(900px 420px at 90% 10%, rgba(180,83,9,.08), transparent 55%),
+        linear-gradient(180deg, #fff, var(--bg));
+      color: var(--ink);
+    }
+    .shell{max-width:1100px;margin:0 auto;padding:1.25rem;}
+    .topbar{
+      background: var(--paper);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px 16px;
+      display:flex;justify-content:space-between;align-items:center;gap:12px;
+      box-shadow:0 14px 45px rgba(17,24,39,.08);
+      margin-bottom:18px;
+    }
+    .brand-title{font-weight:900;letter-spacing:-.02em}
+    .brand-sub{font-size:.85rem;color:var(--muted)}
+    .link-pill{
+      display:inline-flex;gap:8px;align-items:center;
+      padding:8px 12px;border-radius:999px;
+      font-weight:900;font-size:.85rem;color:#fff;
+      background: linear-gradient(135deg, var(--primary), var(--gold));
+      box-shadow:0 12px 30px rgba(11,61,46,.14);
+      transition: transform .15s ease, opacity .15s ease;
+    }
+    .link-pill:hover{transform:translateY(-1px);opacity:.95;}
+
+    .card{
+      background: var(--paper);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:2rem;
+      margin-bottom:1.5rem;
+      box-shadow:0 18px 55px rgba(17,24,39,.08);
+    }
+    .section-title{
+      font-size:1.75rem;font-weight:900;letter-spacing:-.02em;margin-bottom:1rem;
+      color: var(--primary);
+    }
+    .soft{color:var(--muted);}
+    .input{
+      border-radius:12px!important;
+      border:1px solid rgba(17,24,39,.18)!important;
+      background:#fff!important;
+    }
+    .input:focus{
+      box-shadow:0 0 0 6px var(--ring)!important;
+      border-color:rgba(180,83,9,.40)!important;
+      outline:none!important;
+    }
+    .btn-primary{
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      box-shadow:0 14px 30px rgba(11,61,46,.16);
+      transition: transform .15s ease, filter .15s ease;
+    }
+    .btn-primary:hover{transform:translateY(-1px);filter:brightness(1.03);}
+    .btn-secondary{
+      background: rgba(180,83,9,.08);
+      border:1px solid rgba(180,83,9,.20);
+      color: var(--primary);
+      font-weight:900;
+      transition: transform .15s ease, background .15s ease;
+    }
+    .btn-secondary:hover{transform:translateY(-1px);background: rgba(180,83,9,.11);}
+    .callout{
+      background: rgba(11,61,46,.06);
+      border-left:6px solid rgba(11,61,46,.55);
+      border-radius:14px;
+      padding:14px;
+    }
+    .divider{height:1px;background:rgba(17,24,39,.10);margin:18px 0;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadeIn .45s ease-out forwards;}
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div>
+        <div class="brand-title text-lg">Movilidad social en México</div>
+        <div class="brand-sub">Herramienta institucional basada en evidencia del estudio de barreras de clase </div>
+      </div>
+      <a class="link-pill" href="https://www.scielo.org.mx/pdf/espiral/v29n84/1665-0565-espiral-29-84-43.pdf" target="_blank" rel="noopener noreferrer">
+        Ver artículo ↗
+      </a>
+    </div>
+
+    <header class="text-center mb-10">
+      <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight" style="color:var(--primary);">
+        Simulador de Movilidad de Clase Social en México
+      </h1>
+      <p class="mt-3 text-base md:text-lg soft max-w-3xl mx-auto">
+        Visualización educativa de desigualdad de oportunidades y barreras de movilidad, basada en el estudio del Dr. César Augusto Ricardi Morgavi.
+      </p>
+      <div class="mt-5">
+        <a href="https://www.scielo.org.mx/pdf/espiral/v29n84/1665-0565-espiral-29-84-43.pdf"
+           target="_blank" rel="noopener noreferrer"
+           class="btn-secondary inline-flex items-center gap-2 px-4 py-2 rounded-xl">
+          Abrir PDF ↗
+        </a>
+      </div>
+    </header>
+
+        <!-- Contenido Educativo -->
+        <section id="educativo" class="card">
+            <h2 class="section-title">1. Para empezar, idenfica de qué clase social provienes: ¿Cuál es la clase social del hogar en que vivías cuando tenías 15 años de edad?</h2>
+            <p class="mb-6 text-gray-600">Antes de simular tu futuro, entiende tu presente. La sociedad se divide en clases sociales basadas en la ocupación. Abajo las puedes ver. Si ya sabes cuál es tu punto de partida, puedes saltar al simulador.</p>
+            <div class="text-center mb-8">
+                <button onclick="document.getElementById('simulador').scrollIntoView({ behavior: 'smooth' });" class="btn-primary text-white font-extrabold py-2.5 px-6 rounded-xl">
+                    Ir al simulador (Punto 2) &darr;
+                </button>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+		<!-- Infografía EGP -->
+                <div class="p-6 bg-gray-50 rounded-lg text-justify">
+                    <h3 class="text-xl font-bold mb-4">El esquema de clases sociales (EGP)</h3>
+                    <p class="mb-4 text-gray-600">Para analizar la movilidad, el estudio clasifica las ocupaciones en siete grandes grupos. Identificar tu origen es el primer paso para entender tu posible trayectoria. Selecciona la clase social del principal provedor económico del hogar en que vivías cuando tenías 15 años de edad. El principal proveedor es quien aportaba la mayor parte del ingreso económico del hogar.</p>
+                    <ul class="space-y-2 text-sm">
+                        <li class="p-2 bg-purple-100 rounded"><b>I+II (Servicio):</b> Directivos y gerentes de alto nivel; profesionales, administradores y funcionarios de nivel superior; dirigentes de grandes empresas; grandes empresarios; profesionales, administradores y funcionarios de nivel medio e inferior; técnicos con altos niveles de calificación; dirigentes de pequeñas y medianas empresas; supervisores de trabajadores no manuales.</li>
+                        <li class="p-2 bg-blue-100 rounded"><b>IIIa+b (No manual de rutina):</b> Oficinistas, asistentes administrativos, archivistas, otros asalariados que desempeñan tareas de rutinas de oficinas y dependientes de comercio.</li>
+                        <li class="p-2 bg-green-100 rounded"><b>IVa (Independiente no agraria):</b> Patrones de pequeñas unidades económicas con menos de cinco empleados y trabajadores independientes que desarrollan actividades comerciales u ocupaciones manuales calificadas no agrarias.</li>
+                        <li class="p-2 bg-yellow-100 rounded"><b>V+VI (Manual calificada):</b> Trabajadores fabriles y artesanos con un grado alto y medio de calificación; capataces, supervisores industriales, técnicos no especializados, operarios industriales, operarios de maquinaria, mecánicos y trabajadores manuales con especialización en actividades de manufactura o de servicios.</li>
+                        <li class="p-2 bg-orange-100 rounded"><b>VIIa (Manual no calificada):</b> Obreros de baja calificación; Ayudantes y peones fabriles y de la construcción, trabajadores en limpieza y servicios domésticos, vendedores ambulantes, meseros, camareras, repartidor de mensajería.</li>
+                        <li class="p-2 bg-red-100 rounded"><b>IVc (Propietarios agrarios):</b> Dueños de tierras agrícolas; Pequeños propietarios con recursos para invertir en tecnología y medios destinados a la producción agraria; propietarios de tierra que desarrollan actividades agrarias de baja productividad y con trabajadores a cargo.</li>
+                        <li class="p-2 bg-red-200 rounded"><b>VIIb (Asalariados agrícolas):</b> Jornaleros, peones y trabajadores con dependencia salarial en actividades de agricultura y ganadería.</li>
+                    </ul>
+                </div>
+                <!-- Testimonios -->
+                <div class="p-6 bg-gray-50 rounded-lg flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">Voces de la movilidad (simulación)</h3>
+                        <div id="testimonial" class="p-4 bg-white rounded-lg shadow-inner text-gray-700">
+                           <p class="italic" id="narrative-text">"Mi jefe me dice 'licenciado', pero en mi casa todavía huele a la milpa de mi apá en Oaxaca. Dejé el campo para estudiar, y aunque ahora uso corbata, a veces no sé si subí o nomás me moví de lugar. El estudio dice que este brinco, del campo a la oficina, es de los más difíciles."</p>
+                           <p class="text-xs text-gray-500 mt-3 text-right">(Esta es una simulación para ilustrar los datos).</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <button onclick="narrarTestimonio()" class="btn-primary text-white font-extrabold py-2.5 px-6 rounded-xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-circle-fill mr-2" viewBox="0 0 16 16">
+                              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z"/>
+                            </svg>
+                            Escuchar historia
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Simulador de Movilidad Social -->
+        <section id="simulador" class="card">
+            <h2 class="section-title">2. Simulador de movilidad social</h2>
+            <p class="mb-6 text-gray-600">Ahora que conoces las clases sociales, descubre tus probabilidades de movilidad. Ingresa tus datos para simular tu trayectoria y entender las barreras que podrías enfrentar.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div>
+                    <label for="edad" class="font-semibold block mb-2">Edad</label>
+                    <input type="number" id="edad" min="20" max="65" value="30" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div>
+                    <label for="claseOrigen" class="font-semibold block mb-2">Clase social de origen</label>
+                    <select id="claseOrigen" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        <option value="I+II">I+II: Clase de servicio</option>
+                        <option value="IIIa+b">IIIa+b: No-manual de rutina (oficinistas)</option>
+                        <option value="IVa+b">IVa+b: Trabajadores independientes no-agrarios</option>
+                        <option value="V+VI">V+VI: Trabajadores manuales calificados</option>
+                        <option value="VIIa">VIIa: Trabajadores manuales de baja calificación</option>
+                        <option value="IVc" selected>IVc: Propietarios agrarios</option>
+                        <option value="VIIb">VIIb: Asalariados agrícolas</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="genero" class="font-semibold block mb-2">Género</label>
+                    <select id="genero" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        <option value="hombre">Hombre</option>
+                        <option value="mujer">Mujer</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="educacion" class="font-semibold block mb-2">Máximo nivel educativo</label>
+                    <select id="educacion" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        <option value="primaria_o_secundaria">Primaria o secundaria</option>
+                        <option value="preparatoria">Preparatoria</option>
+                        <option value="licenciatura_o_posgrado">Licenciatura o posgrado</option>
+                        </select>
+                </div>
+            </div>
+            <div class="mt-8 text-center">
+                <button onclick="calcularMovilidad()" class="btn-primary text-white font-bold py-3 px-8 rounded-lg text-lg">
+                    Calcular mi movilidad
+                </button>
+            </div>
+        </section>
+
+        <!-- Resultados de la Simulación -->
+        <section id="resultados" class="hidden">
+            <div class="card">
+                <h3 class="text-2xl font-bold mb-4 text-green-800"> Análisis de tu trayectoria potencial</h3>
+                <div id="textoResultado" class="text-lg mb-6 p-4 bg-green-50 border-l-4 border-green-800 rounded-r-lg"></div>
+                <div class="flex justify-center mt-4">
+                     <button id="share-button" class="btn-primary hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="mr-2" viewBox="0 0 16 16">
+                            <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.002 1.002 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z"/>
+                            <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243L6.586 4.672z"/>
+                        </svg>
+                        Compartir #MiMovilidadEs
+                    </button>
+                </div>
+                <div class="mt-8">
+                    <h4 class="text-xl font-bold mb-4 text-center">Tus barreras de clase</h4>
+                    <p class="text-center text-gray-600 mb-4">Este gráfico muestra la dificultad para cruzar de una clase a otra. Las barras más altas representan las fronteras más difíciles de vencer. Tu barrera principal está resaltada. Estas probabilidades son una simplificación basada en patrones de movilidad estimados en "Patrones de fluidez y barreras de clase social en México" (2022). No son predicciones individuales, sino una manera de entender cómo pesa el origen, la educación y el género”.</p>
+                    <div class="relative h-96">
+                        <canvas id="barrerasChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Guía de Acción -->
+        <section id="accion" class="card">
+            <h2 class="section-title">3. Guía de acción y recursos</h2>
+            <p class="mb-6 text-gray-600">Aunque el origen social pesa, existen caminos para mejorar las oportunidades. Aquí tienes algunas recomendaciones basadas en los hallazgos del estudio.</p>
+            <div class="space-y-4">
+                <div class="p-4 bg-green-50 border-l-4 border-green-500 rounded-r-lg">
+                    <h4 class="font-bold">La educación es clave</h4>
+                    <p>El estudio confirma que la educación superior es uno de los motores de movilidad más potentes. Para una mujer de origen rural, por ejemplo, alcanzar la licenciatura puede duplicar sus probabilidades de ascenso a una clase no manual. </p>
+                </div>
+                <div class="p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg">
+                    <h4 class="font-bold">Romper barreras de género</h4>
+                    <p>Para las mujeres, las barreras hacia la clase de servicio (I+II) se han vuelto más permeables que para los hombres en la generación joven. Impulsar la participación femenina en roles de liderazgo y profesionales es fundamental.</p>
+                </div>
+                <div class="p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded-r-lg">
+                    <h4 class="font-bold">Busca apoyos y programas</h4>
+                    <p>Programas como las Becas para el Bienestar Benito Juárez o Jóvenes Construyendo el Futuro buscan reducir las brechas de oportunidad. Infórmate sobre los apoyos disponibles en tu comunidad.</p>
+                    <a href="https://www.gob.mx/becasbenitojuarez" target="_blank" class="text-green-600 hover:underline font-semibold">Becas Benito Juárez &rarr;</a><br>
+                    <a href="https://jovenesconstruyendoelfuturo.stps.gob.mx/" target="_blank" class="text-green-600 hover:underline font-semibold">Jóvenes Construyendo el Futuro &rarr;</a>
+                </div>
+            </div>
+        </section>
+        
+        <footer class="text-center mt-12 text-gray-500 text-sm">
+            <p>Realizada por César Augusto Ricardi Morgavi con base en el artículo "Patrones de fluidez y barreras de clase social en México" (Ricardi, 2022). Esta es una herramienta educativa y de simulación; los resultados son estimaciones basadas en los patrones del estudio.</p> 
+<div style="display:flex; justify-content:center; align-items:center; gap:.35em; flex-wrap:wrap; text-align:center;">
+  <h4 class="font-bold">This work is licensed 2025 under</h4>
+  <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer" style="font-weight:800;">
+    CC BY-NC-SA 4.0
+  </a>
+
+  <span style="display:inline-flex; align-items:center; gap:.3em;">
+    <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="CC" style="width:2em;height:2em;display:block;">
+    <img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="BY" style="width:2em;height:2em;display:block;">
+    <img src="https://mirrors.creativecommons.org/presskit/icons/nc.svg" alt="NC" style="width:2em;height:2em;display:block;">
+    <img src="https://mirrors.creativecommons.org/presskit/icons/sa.svg" alt="SA" style="width:2em;height:2em;display:block;">
+  </span>
+</div>
+
+<a href="https://www.scielo.org.mx/pdf/espiral/v29n84/1665-0565-espiral-29-84-43.pdf" 
+   target="_blank" 
+   class="btn-primary text-white font-extrabold py-2.4 px-6 rounded-xl">
+    Ir al artículo completo
+</a>
+        </footer>
+
+    </div>
+
+    <script>
+    // --- BASE DE DATOS Y LÓGICA DEL SIMULADOR ---
+    
+    const barrerasData = {
+        intermedia: { // 1961-1975
+            hombre: { C1: 0.53, C2: 1.074, C3: 0.149, C4: 0.285, C5: 0.079, C6: 0.616 },
+            mujer:  { C1: -0.97, C2: 1.189, C3: -0.153, C4: 0.245, C5: -0.334, C6: 0.653 }
+        },
+        joven: { // 1976-1986
+            hombre: { C1: 0.418, C2: 0.934, C3: 0.251, C4: 0.296, C5: 0.338, C6: 0.696 },
+            mujer:  { C1: 0.486, C2: 0.405, C3: 0.085, C4: 0.476, C5: 0.144, C6: 0.424 }
+        }
+    };
+
+    const clasesEGP = {
+        'I+II':  { nombre: 'Clase de servicio',            indice: 6 },
+        'IIIa+b':{ nombre: 'No-manual de rutina',          indice: 5 },
+        'IVa+b': { nombre: 'Independientes no-agrarios',   indice: 4 },
+        'V+VI':  { nombre: 'Manuales calificados',         indice: 3 },
+        'VIIa':  { nombre: 'Manuales de baja calificación',indice: 2 },
+        'IVc':   { nombre: 'Propietarios agrarios',        indice: 1 },
+        'VIIb':  { nombre: 'Asalariados agrícolas',        indice: 0 }
+    };
+    
+    const barrerasLabels = {
+        C1: 'VIIb ↔ IVc (Propiedad Tierra)',
+        C2: 'IVc ↔ VIIa (Sectorial Agraria-Manual)',
+        C3: 'VIIa ↔ V+VI (Calificación Manual)',
+        C4: 'V+VI ↔ IVa+b (Manual-Independiente)',
+        C5: 'IVa+b ↔ IIIa+b (Independiente-Oficinista)',
+        C6: 'IIIa+b ↔ I+II (Acceso a Élite)'
+    };
+
+    let barrerasChart = null;
+
+    // Tabla de probabilidades empíricas (con tus 3 niveles educativos)
+    const tablaProbabilidades = {
+        joven: {
+            hombre: {
+                'VIIb': {
+                    primaria_o_secundaria:      { larga: 3,  corta: 12 },
+                    preparatoria:  { larga: 1,  corta: 1 },
+                    licenciatura_o_posgrado:       { larga: 53, corta: 1 }                
+                },
+                'IVc': {
+                    primaria_o_secundaria:      { larga: 2,  corta: 29 },
+                    preparatoria:  { larga: 7, corta: 29 },
+                    licenciatura_o_posgrado:       { larga: 64, corta: 4 } 
+		},
+                'VIIa': {
+                    primaria_o_secundaria:      { larga: 5,  corta: 19 },
+                    preparatoria:  { larga: 16, corta: 24 },
+                    licenciatura_o_posgrado:       { larga: 48, corta: 1 }
+		},
+                'V+VI': {
+                    primaria_o_secundaria:      { larga: 8,  corta: 18 },
+                    preparatoria:  { larga: 12, corta: 6 },
+                    licenciatura_o_posgrado:       { larga: 62, corta: 15 }
+		},
+                'IVa+b': {
+                    primaria_o_secundaria:      { larga: 3,  corta: 10 },
+                    preparatoria:  { larga: 20, corta: 15 },
+                    licenciatura_o_posgrado:       { larga: 62, corta: 8 }
+		},
+                'IIIa+b': {
+                    primaria_o_secundaria:      { larga: 1,  corta: 1 },
+                    preparatoria:  { larga: 35, corta: 35 },
+                    licenciatura_o_posgrado:       { larga: 84, corta: 84 }  
+                },
+                'I+II': {
+                    primaria_o_secundaria:      { larga: 1,  corta: 1 },
+                    preparatoria:  { larga: 15, corta: 15 },
+                    licenciatura_o_posgrado:       { larga: 81, corta: 81 } 
+		}
+            },
+            mujer: {
+                'VIIb': {
+                    primaria_o_secundaria:      { larga: 1,  corta: 1 },
+                    preparatoria:  { larga: 1,  corta: 1 },
+                    licenciatura_o_posgrado:       { larga: 14, corta: 1 }                
+                },
+                'IVc': {
+                    primaria_o_secundaria:      { larga: 1,  corta: 34 },
+                    preparatoria:  { larga: 53, corta: 1 },
+                    licenciatura_o_posgrado:       { larga: 91, corta: 1 } 
+		},
+                'VIIa': {
+                    primaria_o_secundaria:      { larga: 5,  corta: 15 },
+                    preparatoria:  { larga: 11, corta: 2 },
+                    licenciatura_o_posgrado:       { larga: 69, corta: 1 }
+		},
+                'V+VI': {
+                    primaria_o_secundaria:      { larga: 17,  corta: 26 },
+                    preparatoria:  { larga: 25, corta: 13 },
+                    licenciatura_o_posgrado:       { larga: 33, corta: 25 }
+		},
+                'IVa+b': {
+                    primaria_o_secundaria:      { larga: 13,  corta: 16 },
+                    preparatoria:  { larga: 43, corta: 16 },
+                    licenciatura_o_posgrado:       { larga: 61, corta: 18 }
+		},
+                'IIIa+b': {
+                    primaria_o_secundaria:      { larga: 3,  corta: 3 },
+                    preparatoria:  { larga: 1, corta: 1 },
+                    licenciatura_o_posgrado:       { larga: 95, corta: 95 }  
+		},
+                'I+II': {
+                    primaria_o_secundaria:      { larga: 1,  corta: 1 },
+                    preparatoria:  { larga: 6, corta: 6 },
+                    licenciatura_o_posgrado:       { larga: 81, corta: 81 }
+                }
+            }
+        },
+        intermedia: {
+            hombre: {
+                'VIIb': {
+                    primaria_o_secundaria:      { larga: 5,  corta: 3 },
+                    preparatoria:  { larga: 5,  corta: 1 },
+                    licenciatura_o_posgrado:       { larga: 1, corta: 1 }                
+                },
+                'IVc': {
+                    primaria_o_secundaria:      { larga: 1,  corta: 26 },
+                    preparatoria:  { larga: 5, corta: 33 },
+                    licenciatura_o_posgrado:       { larga: 59, corta: 30 } 
+		},
+                'VIIa': {
+                    primaria_o_secundaria:      { larga: 2,  corta: 25 },
+                    preparatoria:  { larga: 4, corta: 23 },
+                    licenciatura_o_posgrado:       { larga: 71, corta: 2 }
+		},
+                'V+VI': {
+                    primaria_o_secundaria:      { larga: 5,  corta: 12 },
+                    preparatoria:  { larga: 4, corta: 8 },
+                    licenciatura_o_posgrado:       { larga: 59, corta: 6 }
+		},
+                'IVa+b': {
+                    primaria_o_secundaria:      { larga: 7,  corta: 16 },
+                    preparatoria:  { larga: 8, corta: 19 },
+                    licenciatura_o_posgrado:       { larga: 74, corta: 14 }
+		},
+                'IIIa+b': {
+                    primaria_o_secundaria:      { larga: 4,  corta: 4 },
+                    preparatoria:  { larga: 34, corta: 34 },
+                    licenciatura_o_posgrado:       { larga: 25, corta: 25 } 
+		},
+                'I+II': {
+                    primaria_o_secundaria:      { larga: 1,  corta: 1 },
+                    preparatoria:  { larga: 73, corta: 73 },
+                    licenciatura_o_posgrado:       { larga: 60, corta: 60 }
+                }
+            },
+            mujer: {
+                'VIIb': {
+                    primaria_o_secundaria:      { larga: 1,  corta: 1 },
+                    preparatoria:  { larga: 1,  corta: 1 },
+                    licenciatura_o_posgrado:       { larga: 100, corta: 1 }                
+                },
+                'IVc': {
+                    primaria_o_secundaria:      { larga: 1,  corta: 38 },
+                    preparatoria:  { larga: 1, corta: 1 },
+                    licenciatura_o_posgrado:       { larga: 89, corta: 1 } 
+		},
+                'VIIa': {
+                    primaria_o_secundaria:      { larga: 16,  corta: 13 },
+                    preparatoria:  { larga: 21, corta: 4 },
+                    licenciatura_o_posgrado:       { larga: 48, corta: 1 }
+		},
+                'V+VI': {
+                    primaria_o_secundaria:      { larga: 1,  corta: 5 },
+                    preparatoria:  { larga: 1, corta: 6 },
+                    licenciatura_o_posgrado:       { larga: 38, corta: 13 }
+		},
+                'IVa+b': {
+                    primaria_o_secundaria:      { larga: 1,  corta: 31 },
+                    preparatoria:  { larga: 13, corta: 72 },
+                    licenciatura_o_posgrado:       { larga: 78, corta: 12 }
+		},
+                'IIIa+b': {
+                    primaria_o_secundaria:      { larga: 5,  corta: 5 },
+                    preparatoria:  { larga: 1, corta: 1 },
+                    licenciatura_o_posgrado:       { larga: 4, corta: 4 }
+		},
+                'I+II': {
+                    primaria_o_secundaria:      { larga: 6,  corta: 12 },
+                    preparatoria:  { larga: 10, corta: 22 },
+                    licenciatura_o_posgrado:       { larga: 15, corta: 30 } 
+		},
+                'I+II': {
+                    primaria_o_secundaria:      { larga: 7,  corta: 7 },
+                    preparatoria:  { larga: 1, corta: 1 },
+                    licenciatura_o_posgrado:       { larga: 55, corta: 55 }               
+                }
+            }
+        }
+    };
+
+    function calcularMovilidad() {
+        // 1. Datos del usuario
+        const edad        = parseInt(document.getElementById('edad').value);
+        const claseOrigen = document.getElementById('claseOrigen').value;
+        const genero      = document.getElementById('genero').value;
+        const educacion   = document.getElementById('educacion').value; // prim_sec / preparatoria / lic_pos
+
+        // 2. Cohorte
+        const anioNacimiento = new Date().getFullYear() - edad;
+        let cohorte;
+        if (anioNacimiento >= 1976) {
+            cohorte = 'joven';
+        } else if (anioNacimiento >= 1961) {
+            cohorte = 'intermedia';
+        } else {
+            cohorte = 'intermedia';
+        }
+
+        // 3. Barrera principal (solo para el gráfico)
+        const datosBarrerasCohorte = barrerasData[cohorte][genero];
+        const indiceOrigen = clasesEGP[claseOrigen].indice;
+        let barreraPrincipalKey = '';
+
+        if (indiceOrigen < 6) {
+            const mapeoBarrera = { 0: 'C1', 1: 'C2', 2: 'C3', 3: 'C4', 4: 'C5', 5: 'C6' };
+            barreraPrincipalKey = mapeoBarrera[indiceOrigen];
+        }
+
+        // 4. Probabilidades desde la tabla
+        let probAscensoLargo = 15; // valores por defecto
+        let probAscensoCorto = 30;
+
+        const tablaCohorte = tablaProbabilidades[cohorte];
+        if (
+            tablaCohorte &&
+            tablaCohorte[genero] &&
+            tablaCohorte[genero][claseOrigen] &&
+            tablaCohorte[genero][claseOrigen][educacion]
+        ) {
+            const registro = tablaCohorte[genero][claseOrigen][educacion];
+            probAscensoLargo = registro.larga;
+            probAscensoCorto = registro.corta;
+        }
+
+        // 5. Texto de resultado
+        const nombreClaseOrigen = clasesEGP[claseOrigen].nombre.toLowerCase();
+
+        let tag = probAscensoLargo > 30 ? "Prometedora"
+                : (probAscensoLargo > 15 ? "Posible" : "Frágil");
+
+        let texto = `
+            <p>Eres <b>${genero}</b> de la cohorte <b>${cohorte}</b>, con origen en la <b>clase ${nombreClaseOrigen}</b> y nivel educativo de <b>${educacion}</b>.</p>
+            <p class="mt-2">Según los patrones estimados, tienes aproximadamente un <b>${probAscensoLargo}%</b> de probabilidad de lograr un ascenso social de larga distancia (por ejemplo, llegar a la clase de servicio I+II).</p>
+            <p class="mt-2">Tu probabilidad de un ascenso de corta distancia (a clases cercanas) es de alrededor del <b>${probAscensoCorto}%</b>.</p>
+
+<p class="mt-2">**Nota: Si tu clase social de origen es la más alta <b>I+II Clase de servicio</b>, no contarás con clases a las que ascender, por lo tanto, interpreta cualquiera de los porcentajes como la probabilidad de permanecer en la clase I+II (reproducción de la clase del principal proveedor).</p>
+            <p class="mt-4 font-bold text-xl text-center text-green-700">#MiMovilidadEs${tag}</p>
+        `;
+
+        document.getElementById('textoResultado').innerHTML = texto;
+        document.getElementById('resultados').classList.remove('hidden');
+        document.getElementById('resultados').classList.add('fade-in');
+
+        // 6. Gráfico
+        actualizarGraficoBarreras(datosBarrerasCohorte, barreraPrincipalKey);
+
+        // 7. Botón de compartir
+        const shareText = `Soy ${genero}, origen ${claseOrigen}, con ${educacion}. Mi probabilidad de ascenso de larga distancia es ~${probAscensoLargo}%. Descubre la tuya en esta app. #MiMovilidadEs${tag}`;
+        const shareButton = document.getElementById('share-button');
+        shareButton.onclick = () => {
+            const textArea = document.createElement("textarea");
+            textArea.value = shareText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                alert('Texto para compartir copiado al portapapeles:\n\n' + shareText);
+            } catch (err) {
+                console.error('No se pudo copiar el texto: ', err);
+            }
+            document.body.removeChild(textArea);
+        };
+
+        document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function actualizarGraficoBarreras(datos, barreraResaltada) {
+        const ctx = document.getElementById('barrerasChart').getContext('2d');
+        const labels = Object.values(barrerasLabels);
+        const dataPoints = Object.values(datos).map(v => Math.abs(v));
+
+        const backgroundColors = Object.keys(datos).map(
+            key => key === barreraResaltada ? 'rgba(56, 161, 105, 0.8)' : 'rgba(179, 157, 219, 0.6)'
+        );
+        const borderColors = Object.keys(datos).map(
+            key => key === barreraResaltada ? 'rgba(47, 133, 85, 1)' : 'rgba(124, 77, 255, 1)'
+        );
+
+        if (barrerasChart) {
+            barrerasChart.destroy();
+        }
+
+        barrerasChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Dificultad de la Barrera',
+                    data: dataPoints,
+                    backgroundColor: backgroundColors,
+                    borderColor: borderColors,
+                    borderWidth: 2,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Coeficiente de Dificultad (Mayor es más difícil)',
+                            font: { size: 14 }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: { size: 10 }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) label += ': ';
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y.toFixed(3);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    function narrarTestimonio() {
+        const texto = document.getElementById('narrative-text').textContent;
+        if ('speechSynthesis' in window) {
+            speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(texto);
+            utterance.lang = 'es-MX';
+            utterance.rate = 0.9;
+            speechSynthesis.speak(utterance);
+        } else {
+            alert("Tu navegador no soporta la síntesis de voz.");
+        }
+    }
+
+    window.onload = () => {
+        actualizarGraficoBarreras(barrerasData.joven.mujer, '');
+    };
+</script>
+
+
